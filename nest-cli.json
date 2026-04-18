@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/api-core/src",
+  "monorepo": true,
+  "root": "apps/api-core",
+  "projects": {
+    "api-core": {
+      "type": "application",
+      "root": "apps/api-core",
+      "entryPoint": "main",
+      "sourceRoot": "apps/api-core/src"
+    },
+    "scraper-service": {
+      "type": "application",
+      "root": "apps/scraper-service",
+      "entryPoint": "main",
+      "sourceRoot": "apps/scraper-service/src"
+    }
+  }
+}

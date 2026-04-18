@@ -1,0 +1,8 @@
+# Artifacts
+node_modules
+dist
+build
+coverage
+
+# Database
+prisma/migrations
