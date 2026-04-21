@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: timescale/timescaledb:latest-pg15
+    container_name: monitorio-db
+    restart: always
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=monitorio_pass
+      - POSTGRES_DB=monitorio
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: monitorio-redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:
