@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Get, Body } from '@nestjs/common';
 import { ProductsService } from './products.service';
 
 @Controller('products')
@@ -8,5 +8,10 @@ export class ProductsController {
   @Post()
   async trackProduct(@Body('url') url: string) {
     return this.productsService.createProduct(url);
+  }
+
+  @Get() 
+  async getAll() {
+    return this.productsService.findAll();
   }
 }
