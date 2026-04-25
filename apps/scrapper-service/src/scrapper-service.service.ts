@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { EventPattern } from '@nestjs/microservices';
 import { PrismaService } from '../../../libs/persistence/src/prisma.service';
 import { FullH4rdScraper } from './vendors/fullh4rd.scraper';
 
@@ -9,8 +10,10 @@ export class ScrapperService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async handleTrackProduct(url: string) {
-    this.logger.log(`Iniciando extracción para: ${url}`);
+  @EventPattern('product_created')
+  async handleTrackProduct(data: { url: string }) {
+    const { url } = data;
+    this.logger.log(`Evento recibido. Procesando URL: ${url}`)
     
     try {
       const scrapedData = await this.fullH4rd.scrape(url);

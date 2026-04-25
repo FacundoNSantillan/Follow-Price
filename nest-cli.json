@@ -11,11 +11,11 @@
       "entryPoint": "main",
       "sourceRoot": "apps/api-core/src"
     },
-    "scraper-service": {
+    "scrapper-service": {
       "type": "application",
-      "root": "apps/scraper-service",
+      "root": "apps/scrapper-service",
       "entryPoint": "main",
-      "sourceRoot": "apps/scraper-service/src"
+      "sourceRoot": "apps/scrapper-service/src"
     }
   }
 }
