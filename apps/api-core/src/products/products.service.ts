@@ -1,12 +1,14 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { PrismaService } from '../../../../libs/persistence/src/prisma.service';
+import { ProductsRepository } from '@lib/persistence/src/repositories/products.repository';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @Inject('SCRAPPER_SERVICE') private readonly client: ClientProxy,
     private readonly prisma: PrismaService,
+    private readonly productsRepo: ProductsRepository,
   ) {}
 
   async createProduct(url: string) {
@@ -15,13 +17,6 @@ export class ProductsService {
   }
 
   async findAll() {
-    return this.prisma.product.findMany({
-      include: {
-        prices: {
-          orderBy: { createdAt: 'desc' },
-          take: 1, 
-        },
-      },
-    });
+    return this.productsRepo.findAllWithLastPrice();
   }
 }
