@@ -65,7 +65,16 @@ GOOGLE_MODEL="gemma-3-27b-it"
 PORT=3000
 NODE_ENV="development"
 ```
-### 4. Configuración de Base de Datos y Tipos
+### 4. Entorno de Infraestructura (Docker)
+Debes tener instalados Docker y Docker Compose. Esto levantará automáticamente PostgreSQL y Redis con las configuraciones necesarias.
+```bash
+# Levantar los servicios en segundo plano (PostgreSQL y Redis)
+docker-compose up -d
+
+# Verificar que los contenedores estén activos
+docker ps
+```
+### 5. Configuración de Base de Datos y Tipos
 ```bash
 # 1. Generar el cliente de Prisma (crea los tipos en node_modules)
 npx prisma generate
@@ -77,7 +86,7 @@ npx prisma db push
 # 3. (Opcional) Abrir el panel visual para verificar los datos
 npx prisma studio
 ```
-### 5. Ejecución del Sistema
+### 6. Ejecución del Sistema
 Como el proyecto es un monorepo, debes iniciar los microservicios en terminales separadas para poder visualizar los logs de cada uno de forma independiente.
 ```bash
 # Terminal 1: API Core (Punto de entrada HTTP)
@@ -88,7 +97,7 @@ npm run start:dev:api
 # Se conecta a Redis para recibir tareas de scraping y normalización
 npm run start:dev:scrapper
 ```
-### 6. Verificación del Flujo (Health Check)
+### 7. Verificación del Flujo (Health Check)
 Para asegurarte de que los microservicios están comunicados correctamente a través de Redis y la IA, realiza la siguiente prueba:
 
 1. Enviar Petición: Realiza un POST a http://localhost:3000/products. (Actualmente soportado: [FullH4rd](https://fullh4rd.com.ar)).
@@ -117,5 +126,3 @@ Este proyecto se encuentra en una etapa de desarrollo activo. A continuación se
 *   [ ] **Nuevas Tiendas Soportadas:** Integración de selectores para [Compra Gamer](https://compragamer.com), [Venex](https://www.venex.com.ar) y [Gezatek](https://www.gezatek.com.ar).
 *   [ ] **Resiliencia de Scraping:** Implementación de rotación de *Proxies* y *User-Agents* para evitar bloqueos por IP.
 *   [ ] **Renderizado Dinámico:** Soporte para sitios con contenido generado por JavaScript mediante **Puppeteer**.
-
----
