@@ -8,13 +8,17 @@ generator client {
 }
 
 model Product {
-  id        String     @id @default(uuid())
-  name      String
-  url       String     @unique
-  store     String
-  image     String?
-  prices    PriceLog[]
-  createdAt DateTime   @default(now())
+  id           String     @id @default(uuid())
+  url          String     @unique
+  name         String     
+  originalName String?    
+  category     String?    
+  specs        Json?      
+  store        String
+  image        String?
+  prices       PriceLog[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @default(now()) @updatedAt
 }
 
 model PriceLog {

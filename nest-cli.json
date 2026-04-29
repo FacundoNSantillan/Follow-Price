@@ -3,19 +3,29 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "apps/api-core/src",
   "monorepo": true,
-  "root": "apps/api-core",
   "projects": {
+    "ai": {
+      "type": "library",
+      "root": "libs/ai",
+      "entryFile": "index",
+      "sourceRoot": "libs/ai/src"
+    },
     "api-core": {
       "type": "application",
       "root": "apps/api-core",
-      "entryPoint": "main",
+      "entryFile": "main", 
       "sourceRoot": "apps/api-core/src"
     },
     "scrapper-service": {
       "type": "application",
       "root": "apps/scrapper-service",
-      "entryPoint": "main",
+      "entryFile": "main",
       "sourceRoot": "apps/scrapper-service/src"
     }
+  },
+  "compilerOptions": {
+    "webpack": true,
+    "manualRestart": true,
+    "outputPath": "dist" 
   }
 }

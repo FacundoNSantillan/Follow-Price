@@ -3,7 +3,8 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { EventPattern } from '@nestjs/microservices';
 import { PrismaService } from '../../../libs/persistence/src/prisma.service';
 import { FullH4rdScraper } from './vendors/fullh4rd.scraper';
-import { ProductsRepository } from '@lib/persistence/src/repositories/products.repository';
+import { ProductsRepository } from '../../../libs/persistence/src/repositories/products.repository';
+import { AiService } from '../../../libs/ai/src/ai.service';
 
 @Injectable()
 export class ScrapperService {
@@ -12,29 +13,34 @@ export class ScrapperService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly productsRepo: ProductsRepository
+    private readonly productsRepo: ProductsRepository,
+    private readonly aiService: AiService 
   ) {};
  
-  @EventPattern('product_created')
+@EventPattern('product_created')
   async handleTrackProduct(data: { url: string }) {
     const { url } = data;
-    this.logger.log(`Evento recibido. Procesando URL: ${url}`)
+    this.logger.log(`Procesando URL: ${url}`);
     
     try {
       const scrapedData = await this.fullH4rd.scrape(url);
+      const aiResult = await this.aiService.normalizeProduct(scrapedData.name);
+      this.logger.debug(`IA devolvió: ${JSON.stringify(aiResult)}`);
 
       const product = await this.prisma.product.upsert({
         where: { url: scrapedData.storeUrl },
-        update: {
-          image: scrapedData.image,
-        },
+        update: { image: scrapedData.image },
         create: {
-          name: scrapedData.name,
+          name: aiResult.cleanName || scrapedData.name, 
+          originalName: scrapedData.name,
+          category: aiResult.category || 'General',
+          specs: aiResult.specs || {},
           url: scrapedData.storeUrl,
           store: scrapedData.storeName,
           image: scrapedData.image,
         },
       });
+      console.log('RESULTADO IA:', aiResult)
 
       await this.prisma.priceLog.create({
         data: {
@@ -43,12 +49,13 @@ export class ScrapperService {
         },
       });
 
-      this.logger.log(`Registro exitoso: ${product.name} - $${scrapedData.price}`);
+      this.logger.log(`¡Éxito! Producto normalizado: ${product.name}`);
     } catch (error: any) {
-      this.logger.error(`Error al procesar el producto: ${error.message}`);
+      this.logger.error(`Error: ${error.message}`);
     }
-  }
-  @Cron(CronExpression.EVERY_30_SECONDS) 
+}
+
+  @Cron(CronExpression.EVERY_5_MINUTES) 
   async handleCron() {
     this.logger.debug('Iniciando barrido automático de precios');
 
@@ -62,7 +69,7 @@ export class ScrapperService {
         const scrapedData = await this.fullH4rd.scrape(product.url);
         
         if (lastPriceEntry && lastPriceEntry.price === scrapedData.price) {
-          this.logger.log(`Simple chequeo: ${product.name} mantiene su precio de $${scrapedData.price}.`);
+          this.logger.log(`Sin cambios: ${product.name} mantiene su precio.`);
         } else {
           await this.prisma.priceLog.create({
             data: {
@@ -70,12 +77,12 @@ export class ScrapperService {
               productId: product.id,
             },
           });
-          this.logger.log(`¡CAMBIO DE PRECIO! ${product.name}: $${scrapedData.price}`);
+          this.logger.log(`¡CAMBIO! ${product.name}: $${scrapedData.price}`);
         }
 
         await new Promise(resolve => setTimeout(resolve, 5000));
 
-      } catch (error:any) {
+      } catch (error: any) {
         this.logger.error(`Error en ${product.name}: ${error.message}`);
       }
     }

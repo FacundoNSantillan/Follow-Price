@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { PrismaService } from '../../../../libs/persistence/src/prisma.service';
-import { ProductsRepository } from '@lib/persistence/src/repositories/products.repository';
+import { ProductsRepository } from '../../../../libs/persistence/src/repositories/products.repository';
 
 @Injectable()
 export class ProductsService {
